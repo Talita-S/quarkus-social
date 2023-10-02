@@ -9,6 +9,7 @@ import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.transaction.Transactional;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ class PostResourceTest {
 
     @Inject
     UserRepository userRepository;
+    Long userId;
 
     @BeforeEach
     @Transactional
@@ -31,6 +33,7 @@ class PostResourceTest {
         user.setAge(30);
 
         userRepository.persist(user);
+        userId = user.getId();
     }
 
     @Test
@@ -39,10 +42,10 @@ class PostResourceTest {
         var postRequest = new CreatePostRequest();
         postRequest.setText("sample text");
 
-        var userId = 1;
+        var userID = 1;
 
         given()
-                .contentType(ContentType.JSON).body(JsonbBuilder.create().toJson(postRequest)).pathParam("userId", userId)
+                .contentType(ContentType.JSON).body(JsonbBuilder.create().toJson(postRequest)).pathParam("userId", userID)
         .when()
                 .post()
         .then()
@@ -63,6 +66,60 @@ class PostResourceTest {
                 .post()
         .then()
                 .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should return 404 when user doesn't exist")
+    public void listPostUserNotFoundTest(){
+        var nonexistentUserId = 99;
+
+        given()
+                .pathParam("userId", nonexistentUserId)
+        .when()
+                .get()
+        .then()
+                .statusCode(404);
+
+    }
+
+    @Test
+    @DisplayName("should return 400 when followerId header is not present")
+    public void listPostFollowerHeaderNotSendTest(){
+        given()
+                .pathParam("userId", userId)
+        .when()
+                .get()
+        .then()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("should return 400 when follower doesn't exist")
+    public void listPostFollowerNotFoundTest(){
+
+        var nonexistentFollowerId = 999;
+
+        given()
+                .pathParam("userId", userId)
+                .header("followerId", nonexistentFollowerId)
+        .when()
+                .get()
+        .then()
+                .statusCode(400)
+                .body(Matchers.is("Nonexistent followerId"));
+
+    }
+
+    @Test
+    @DisplayName("should return 403 when follower isn't a follower")
+    public void listPostNotAFollowerTest(){
+
+    }
+
+    @Test
+    @DisplayName("should return posts")
+    public void listPostsTest(){
+
     }
 
 }
