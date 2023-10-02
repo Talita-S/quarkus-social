@@ -1,6 +1,8 @@
 package io.github.talita.s.quarkussocial.rest;
 
+import io.github.talita.s.quarkussocial.domain.model.Follower;
 import io.github.talita.s.quarkussocial.domain.model.User;
+import io.github.talita.s.quarkussocial.domain.repository.FollowerRepository;
 import io.github.talita.s.quarkussocial.domain.repository.UserRepository;
 import io.github.talita.s.quarkussocial.rest.dto.CreatePostRequest;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
@@ -23,8 +25,11 @@ class PostResourceTest {
 
     @Inject
     UserRepository userRepository;
+    @Inject
+    FollowerRepository followerRepository;
     Long userId;
     Long userNotFollowerId;
+    Long userFollowerId;
 
     @BeforeEach
     @Transactional
@@ -44,6 +49,19 @@ class PostResourceTest {
 
         userRepository.persist(userNotFollower);
         userNotFollowerId = userNotFollower.getId();
+
+        //usuario seguidor
+        var userFollower = new User();
+        userFollower.setName("Ciclano");
+        userFollower.setAge(30);
+
+        userRepository.persist(userFollower);
+        userFollowerId = userFollower.getId();
+
+        Follower follower = new Follower();
+        follower.setUser(user);
+        follower.setFollower(userFollower);
+        followerRepository.persist(follower);
     }
 
     @Test
@@ -138,6 +156,14 @@ class PostResourceTest {
     @Test
     @DisplayName("should return posts")
     public void listPostsTest(){
+
+        given()
+                .pathParam("userId", userId)
+                .header("followerId", userFollowerId)
+        .when()
+                .get()
+        .then()
+                .statusCode(200);
 
     }
 
