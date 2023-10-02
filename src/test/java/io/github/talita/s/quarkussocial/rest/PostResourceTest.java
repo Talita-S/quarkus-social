@@ -1,8 +1,10 @@
 package io.github.talita.s.quarkussocial.rest;
 
 import io.github.talita.s.quarkussocial.domain.model.Follower;
+import io.github.talita.s.quarkussocial.domain.model.Post;
 import io.github.talita.s.quarkussocial.domain.model.User;
 import io.github.talita.s.quarkussocial.domain.repository.FollowerRepository;
+import io.github.talita.s.quarkussocial.domain.repository.PostRepository;
 import io.github.talita.s.quarkussocial.domain.repository.UserRepository;
 import io.github.talita.s.quarkussocial.rest.dto.CreatePostRequest;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
@@ -27,6 +29,8 @@ class PostResourceTest {
     UserRepository userRepository;
     @Inject
     FollowerRepository followerRepository;
+    @Inject
+    PostRepository postRepository;
     Long userId;
     Long userNotFollowerId;
     Long userFollowerId;
@@ -41,6 +45,11 @@ class PostResourceTest {
 
         userRepository.persist(user);
         userId = user.getId();
+
+        Post post = new Post();
+        post.setText("Post sample");
+        post.setUser(user);
+        postRepository.persist(post);
 
         //usuario não seguidor
         var userNotFollower = new User();
@@ -163,8 +172,8 @@ class PostResourceTest {
         .when()
                 .get()
         .then()
-                .statusCode(200);
-
+                .statusCode(200)
+                .body("size()", Matchers.is(1));
     }
 
 }
