@@ -24,16 +24,26 @@ class PostResourceTest {
     @Inject
     UserRepository userRepository;
     Long userId;
+    Long userNotFollowerId;
 
     @BeforeEach
     @Transactional
     public void setUP(){
+        //usuario padrão
         var user = new User();
         user.setName("Fulano");
         user.setAge(30);
 
         userRepository.persist(user);
         userId = user.getId();
+
+        //usuario não seguidor
+        var userNotFollower = new User();
+        userNotFollower.setName("Fulano");
+        userNotFollower.setAge(30);
+
+        userRepository.persist(userNotFollower);
+        userNotFollowerId = userNotFollower.getId();
     }
 
     @Test
@@ -113,6 +123,15 @@ class PostResourceTest {
     @Test
     @DisplayName("should return 403 when follower isn't a follower")
     public void listPostNotAFollowerTest(){
+
+        given()
+                .pathParam("userId", userId)
+                .header("followerId", userNotFollowerId)
+        .when()
+                .get()
+        .then()
+                .statusCode(403)
+                .body(Matchers.is("You can't see these posts"));
 
     }
 
