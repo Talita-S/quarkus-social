@@ -148,9 +148,23 @@ class FollowerResourceTest {
                 .pathParam("userId", nonexistentUserId)
                 .queryParam("followerId", followerId)
                 .when()
-                .get()
+                .delete()
                 .then()
                 .statusCode(Response.Status.NOT_FOUND.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("should unfollow an user")
+    public void unfollowUserTest() {
+
+        given()
+                .contentType(ContentType.JSON)
+                .pathParam("userId", userId)
+                .queryParam("followerId", followerId)
+                .when()
+                .delete()
+                .then()
+                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
     }
 
 }
