@@ -130,8 +130,11 @@ class FollowerResourceTest {
                         .then()
                         .extract().response();
         var followersCount = response.jsonPath().get("followersCount");
+        var followersContent = response.jsonPath().getList("content");
+
         assertEquals(Response.Status.OK.getStatusCode(), response.statusCode());
         assertEquals(1, followersCount);
+        assertEquals(1, followersContent.size());
     }
 
 }
