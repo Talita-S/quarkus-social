@@ -26,16 +26,26 @@ class FollowerResourceTest {
     @Inject
     UserRepository userRepository;
     Long userId;
+    Long followerId;
 
     @BeforeEach
     @Transactional
     void setUp(){
+        //usuario
         var user = new User();
         user.setName("Fulano");
         user.setAge(30);
 
         userRepository.persist(user);
         userId = user.getId();
+
+        //seguidor
+        var follower = new User();
+        follower.setName("Cicrano");
+        follower.setAge(30);
+
+        userRepository.persist(follower);
+        followerId = follower.getId();
     }
 
     @Test
@@ -69,6 +79,21 @@ class FollowerResourceTest {
                 .put()
         .then()
                 .statusCode(Response.Status.NOT_FOUND.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("should follow a user")
+    public void followUserTest(){
+        var body = new FollowerRequest();
+        body.setFollowerId(followerId);
+
+        given()
+                .contentType(ContentType.JSON).body(JsonbBuilder.create().toJson(body))
+                .pathParam("userId", userId)
+        .when()
+                .put()
+        .then()
+                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
     }
 
 }
