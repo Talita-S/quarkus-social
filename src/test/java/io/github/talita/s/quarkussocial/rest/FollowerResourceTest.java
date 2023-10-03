@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
 @TestHTTPEndpoint(FollowerResource.class)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FollowerResourceTest {
 
     @Inject
@@ -58,7 +57,6 @@ class FollowerResourceTest {
 
     @Test
     @DisplayName("should return 409 when Follower Id is equal to User Id")
-    @Order(1)
     public void sameUserAsFollowerTest() {
         var body = new FollowerRequest();
         body.setFollowerId(userId);
@@ -75,7 +73,6 @@ class FollowerResourceTest {
 
     @Test
     @DisplayName("should return 404 on follow a user when User Id doesn't exist")
-    @Order(2)
     public void userNotFoundWhenTryingToFollowTest() {
         var body = new FollowerRequest();
         body.setFollowerId(userId);
@@ -93,7 +90,6 @@ class FollowerResourceTest {
 
     @Test
     @DisplayName("should follow a user")
-    @Order(3)
     public void followUserTest() {
         var body = new FollowerRequest();
         body.setFollowerId(followerId);
@@ -109,7 +105,6 @@ class FollowerResourceTest {
 
     @Test
     @DisplayName("should return 404 on list user followers and User Id doesn't exist")
-    @Order(4)
     public void userNotFoundWhenListingFollowersTest() {
 
         var nonexistentUserId = 999;
@@ -125,7 +120,6 @@ class FollowerResourceTest {
 
     @Test
     @DisplayName("should list a user's followers")
-    @Order(5)
     public void listFollowersTest() {
         var response =
                 given()
