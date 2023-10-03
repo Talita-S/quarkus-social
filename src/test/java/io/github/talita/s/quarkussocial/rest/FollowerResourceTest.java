@@ -65,8 +65,8 @@ class FollowerResourceTest {
     }
 
     @Test
-    @DisplayName("should return 404 when User Id doesn't exist")
-    public void userNotFoundTest(){
+    @DisplayName("should return 404 on follow a user when User Id doesn't exist")
+    public void userNotFoundWhenTryingToFollowTest(){
         var body = new FollowerRequest();
         body.setFollowerId(userId);
 
@@ -94,6 +94,21 @@ class FollowerResourceTest {
                 .put()
         .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("should return 404 on list user followers and User Id doesn't exist")
+    public void userNotFoundWhenListingFollowersTest(){
+
+        var nonexistentUserId = 999;
+
+        given()
+                .contentType(ContentType.JSON)
+                .pathParam("userId", nonexistentUserId)
+        .when()
+                .get()
+        .then()
+                .statusCode(Response.Status.NOT_FOUND.getStatusCode());
     }
 
 }
